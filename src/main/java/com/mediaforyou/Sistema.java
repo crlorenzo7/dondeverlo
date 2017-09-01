@@ -20,16 +20,22 @@ public class Sistema {
 	
 	public ArrayList<JSONObject> buscarArticulosPorTitulo(String query,int n){
 		ArrayList<JSONObject> datos=new ArrayList<JSONObject>();
+		if(query=="") {
+			datos=GL.buscarArticulos(query,n);
+		}else {
 		datos=GL.buscarArticulos(query,n);
-		if(datos.isEmpty()) {
+		//if(datos.isEmpty()) {
+			System.out.println("hola");
 			datos = GI.buscar(query);
 			
 			if(!datos.isEmpty()) {
 				for(JSONObject ficha:datos) {
+					System.out.println(ficha.toString());
 					GL.guardarArticulo(ficha);
 				}
 				datos=GL.buscarArticulos(query,0);
 			}
+		//}
 		}
 		
 		return datos;

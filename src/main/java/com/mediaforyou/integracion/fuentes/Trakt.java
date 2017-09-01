@@ -116,22 +116,32 @@ public class Trakt {
 	}
 	
 	public String getCalificacion(Document doc) {
-		Double calificacion = Double.parseDouble(doc.select("div#summary-ratings-wrapper").first().select("div.rating").first().text().replace("%","").trim());
-		calificacion=calificacion/10;
-		return calificacion.toString();
+		if(doc.select("div#summary-ratings-wrapper").first()!=null) {
+			if(doc.select("div#summary-ratings-wrapper").first().select("div.rating").first()!=null) {
+				Double calificacion = Double.parseDouble(doc.select("div#summary-ratings-wrapper").first().select("div.rating").first().text().replace("%","").trim());
+				calificacion=calificacion/10;
+				return calificacion.toString();
+			}else {
+				return "0.0";
+			}
+		}else {
+			return "0.0";
+		}
 	}
 	
 	public String getImdb(Document doc) {
 		String imdb="";
 		boolean encontrado = false;
-		Elements lista = doc.select("ul.external").first().select("a");
-		for(int i=0;i<lista.size() && !encontrado;i++) {
-			Element a=lista.get(i);
-			if(a.text().trim().equals("IMDB")) {
-				String[] trozos= a.attr("href").split("tt");
-				if(trozos.length>=3) {
-					imdb=(a.attr("href").split("tt")[2]).trim();
-					encontrado=true;
+		if(doc.select("ul.external").first()!=null) {
+			Elements lista = doc.select("ul.external").first().select("a");
+			for(int i=0;i<lista.size() && !encontrado;i++) {
+				Element a=lista.get(i);
+				if(a.text().trim().equals("IMDB")) {
+					String[] trozos= a.attr("href").split("tt");
+					if(trozos.length>=3) {
+						imdb=(a.attr("href").split("tt")[2]).trim();
+						encontrado=true;
+					}
 				}
 			}
 		}
@@ -154,6 +164,54 @@ public class Trakt {
 		return imdb;
 	}
 	
+	public JSONObject getFichaPorTitulo(int seccion,int anio,String titulo_en) {
+		
+		String url="https://trakt.tv/search/?query="+titulo_en.replaceAll("\\s+","+");
+		JSONObject ficha=new JSONObject();
+		try {
+			
+			Document doc = Jsoup.connect(url).timeout(0).get();
+			Elements resultados = doc.select("div.fanarts").first().select("div.grid-item");
+			boolean encontrado=false;
+			for(int i=0;i<resultados.size() && !encontrado;i++) {
+				Element e=resultados.get(i);
+				JSONObject id=new JSONObject();
+				//id.put("anio", Integer.parseInt(e.select("a").first().select("div.fanart").first().select("div.titles").first().select("h3").first().select("span.year").first().text().trim()));
+				Elements enlaces=e.select("a");
+				
+				for(Element pos:enlaces) {
+					if(pos.select("div.fanart").first()!=null && !pos.select("div.fanart").first().select("div.titles").first().select("h3").first().select("span.year").first().text().trim().equals("")) {
+						
+						int an=Integer.parseInt(pos.select("div.fanart").first().select("div.titles").first().select("h3").first().select("span.year").first().text().trim());
+						String tit=pos.select("div.fanart").first().select("div.titles").first().select("meta").first().attr("content").trim();
+						if(an==anio && titulo_en.equals(tit) ) {
+							String code ="";
+							if(seccion==1) {
+								code=e.attr("data-show-id").trim();
+							}else {
+								code=e.attr("data-movie-id").trim();
+							}
+							encontrado=true;
+							ficha=this.getFicha(seccion, code);
+						}
+						
+					}
+				}
+			}
+			
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if(!ficha.has("imdb")) {
+			ficha.put("error", "invalido");
+		}
+		return ficha;
+	}
+	
 	public JSONObject getFicha(int seccion,String code) {
 		String tipoA="movies";
 		if(seccion==1) {
@@ -173,7 +231,7 @@ public class Trakt {
 				ficha.put("imdb", this.getTVDB(doc));
 			}
 			if(tipoA.equals("shows")) {
-				ficha.put("capitulos", this.getCapitulos(code));
+				//ficha.put("capitulos", this.getCapitulos(code));
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

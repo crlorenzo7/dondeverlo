@@ -29,7 +29,7 @@ public class Articulo {
 	String caratula;
 	String fondo;
 	String codeFA;
-	String codeTTV;
+	String codeTTV="0";
 	String director;
 	@Index int tipo;
 	
@@ -117,15 +117,15 @@ public class Articulo {
 		this.calificacion_media=ficha.getDouble("calificacion");
 		this.nfavs = 0;
 		this.nvistas = 0;
-		
-		String etiquetas=this.titulo+", "+this.titulo_en+", "+unificarReparto(ficha.getJSONArray("reparto"))+", "+this.genero+", "+this.director;
+		Texto t=new Texto();
+		String etiquetas=t.quitarTildes(this.titulo)+", "+t.quitarTildes(this.titulo_en)+", "+this.titulo+", "+this.titulo_en+", "+unificarReparto(ficha.getJSONArray("reparto"))+", "+this.genero+", "+t.quitarTildes(this.genero)+", "+this.director;
 		this.etiquetas=etiquetas;
 		this.fechaActualizacion=new Date();
 		this.caratula=ficha.getString("caratula");
 		this.fondo=ficha.getString("fondo");
 		this.tipo=ficha.getInt("tipo");
 		this.codeFA=ficha.getString("idFA");
-		this.codeTTV=ficha.getString("idTTV");
+		//this.codeTTV=ficha.getString("idTTV");
 
 	}
 

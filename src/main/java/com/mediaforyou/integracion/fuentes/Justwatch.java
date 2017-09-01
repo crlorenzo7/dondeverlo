@@ -14,10 +14,14 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
+import com.mediaforyou.misc.Texto;
+
+
 public class Justwatch {
 	
 	private String URLBASE="https://apis.justwatch.com/content/titles/es_ES/popular?body=%7B%";
 	private ArrayList<String> empresas=new ArrayList();
+	private Texto t=new Texto();
 
 	public Justwatch() {
 		empresas.add("google");
@@ -111,7 +115,7 @@ public class Justwatch {
 		
 		for(int i=0;i<resultados.length();i++) {
 			JSONObject r=resultados.getJSONObject(i);
-			if((r.getString("original_title").toLowerCase().replaceAll("\\s+","")).equals(to.toLowerCase().replaceAll("\\s+",""))) {
+			if((r.getString("original_title").toLowerCase().replaceAll("\\s+","").replaceAll(":", "")).equals(to.toLowerCase().replaceAll("\\s+","").replaceAll(":", ""))) {
 				ArrayList<JSONObject> subcripcion=new ArrayList();
 				JSONObject alquiler = new JSONObject();
 				JSONObject compra=new JSONObject();

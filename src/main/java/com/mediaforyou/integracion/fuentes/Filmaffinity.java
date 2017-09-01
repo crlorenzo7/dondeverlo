@@ -158,7 +158,8 @@ public class Filmaffinity {
 			
 			if(resul!=null) {
 				Elements resultados = doc.select("div.main-search-wrapper").first().select("div.se-it");
-				for(Element e:resultados) {
+				for(int i=0;i<resultados.size() && i<10;i++) {
+					Element e=resultados.get(i);
 					JSONObject id=new JSONObject();
 					id.put("anio", Integer.parseInt(e.select("div.ye-w").first().text().trim()));
 					id.put("id", e.select("div.movie-card").first().attr("data-movie-id").trim());

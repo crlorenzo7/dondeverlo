@@ -27,9 +27,9 @@ public class GestionIntegracion {
 	
 	public ArrayList<JSONObject> buscar(String query) {
 		ArrayList<JSONObject> idsFA = fa.buscarPorTitulo(query);
-		ArrayList<JSONObject> idsTTV =ttv.buscarPorTitulo(query);
+		//ArrayList<JSONObject> idsTTV =ttv.buscarPorTitulo(query);
 		
-		ArrayList<Integer> toerase=new ArrayList<Integer>();
+		/*ArrayList<Integer> toerase=new ArrayList<Integer>();
 		
 		
 		for(JSONObject s:idsFA) {
@@ -52,7 +52,7 @@ public class GestionIntegracion {
 		for(int j:toerase){
 			idsFA.remove((j-contador));
 			contador++;
-		}
+		}*/
 		
 		
 		
@@ -60,29 +60,33 @@ public class GestionIntegracion {
 		
 		for(JSONObject s:idsFA) {
 			JSONObject fichaFA = fa.getFicha(s.getString("id"));
-			JSONObject fichaTTV = ttv.getFicha(s.getInt("tipo"), s.getString("idTTV"));
-			JSONObject imagenes = far.getImagenes(fichaTTV.getString("imdb"), s.getInt("tipo"));
-			ArrayList<JSONObject> precios = jw.buscarPrecios(fichaFA.getString("titulo_es"),fichaFA.getString("titulo_en"), fichaFA.getInt("anio"));
-			if(!precios.isEmpty()) {
-				if(!imagenes.has("error")){
-					String titulo = t.quitarTildes(fichaFA.getString("titulo_es"));
-					
-					fichaFA.put("trailer", yt.getVideo("trailer " + titulo + "castellano"));
-					fichaFA.put("calificacion",fichaTTV.getString("calificacion"));
-					fichaFA.put("reparto",fichaTTV.getJSONArray("reparto"));
-					fichaFA.put("imdb",fichaTTV.getString("imdb"));
-					
-					fichaFA.put("fondo",imagenes.getString("fondo"));
-					fichaFA.put("caratula",imagenes.getString("caratula"));
-					if(s.getInt("tipo")==1){
-						fichaFA.put("capitulos",fichaTTV.getJSONArray("capitulos"));
+			JSONObject fichaTTV = ttv.getFichaPorTitulo(s.getInt("tipo"),s.getInt("anio"),fichaFA.getString("titulo_en"));//ttv.getFicha(s.getInt("tipo"), s.getString("idTTV"));
+			if(!fichaTTV.has("error")) {
+				JSONObject imagenes = far.getImagenes(fichaTTV.getString("imdb"), s.getInt("tipo"));
+				ArrayList<JSONObject> precios = jw.buscarPrecios(fichaFA.getString("titulo_es"),fichaFA.getString("titulo_en"), fichaFA.getInt("anio"));
+				
+				if(!precios.isEmpty()) {
+					System.out.println("hola2");
+					if(!imagenes.has("error")){
+						String titulo = t.quitarTildes(fichaFA.getString("titulo_es"));
+						
+						fichaFA.put("trailer", yt.getVideo("trailer " + titulo + "castellano"));
+						fichaFA.put("calificacion",fichaTTV.getString("calificacion"));
+						fichaFA.put("reparto",fichaTTV.getJSONArray("reparto"));
+						fichaFA.put("imdb",fichaTTV.getString("imdb"));
+						
+						fichaFA.put("fondo",imagenes.getString("fondo"));
+						fichaFA.put("caratula",imagenes.getString("caratula"));
+						if(s.getInt("tipo")==1){
+							//fichaFA.put("capitulos",fichaTTV.getJSONArray("capitulos"));
+						}
+						fichaFA.put("tipo",s.getInt("tipo"));
+						fichaFA.put("idFA",s.getString("id"));
+						//fichaFA.put("idTTV", s.getString("idTTV"));
+						fichaFA.put("precios", precios);
+						
+						fichas.add(fichaFA);
 					}
-					fichaFA.put("tipo",s.getInt("tipo"));
-					fichaFA.put("idFA",s.getString("id"));
-					fichaFA.put("idTTV", s.getString("idTTV"));
-					fichaFA.put("precios", precios);
-					
-					fichas.add(fichaFA);
 				}
 			}
 		}

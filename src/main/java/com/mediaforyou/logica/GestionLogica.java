@@ -207,7 +207,7 @@ public class GestionLogica {
 				aJSON.put("reparto", getRepartoByIDA(aJSON.getString("id")));
 				aJSON.put("precios", getPreciosByIDA(aJSON.getString("id")));
 				if(aJSON.getInt("tipo")==1) {
-					aJSON.put("capitulos", getCapitulosByIDA(aJSON.getString("id")));
+					//aJSON.put("capitulos", getCapitulosByIDA(aJSON.getString("id")));
 				}
 				articulos.add(aJSON);
 			}
@@ -236,7 +236,7 @@ public class GestionLogica {
 		guardarReparto(articulo.getString("id"),articulo.getJSONArray("reparto"));
 		guardarPrecios(articulo.getString("id"),articulo.getJSONArray("precios"));
 		if(articulo.getInt("tipo")==1) {
-			guardarCapitulos(articulo.getString("id"),articulo.getJSONArray("capitulos"));
+			//guardarCapitulos(articulo.getString("id"),articulo.getJSONArray("capitulos"));
 		}
 	}
 	
